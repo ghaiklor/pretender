@@ -1,7 +1,7 @@
 [package]
 name = "pretender"
 version = "0.1.0"
-edition = "2021"
+edition = "2018"
 description = "CLI to help you pretend your machine does upgrades, compilation, docker pulling or whatever"
 authors = ["Eugene Obrezkov <ghaiklor@gmail.com>"]
 keywords = ["pretender", "pretend", "cli", "progress", "wait"]
