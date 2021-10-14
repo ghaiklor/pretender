@@ -8,6 +8,5 @@ keywords = ["pretender", "pretend", "cli", "progress", "wait"]
 categories = ["command-line-utilities", "games"]
 homepage = "https://github.com/ghaiklor/pretender"
 repository = "https://github.com/ghaiklor/pretender"
-license = "MIT"
 license-file = "LICENSE"
 readme = "README.md"
