@@ -10,3 +10,7 @@ homepage = "https://github.com/ghaiklor/pretender"
 repository = "https://github.com/ghaiklor/pretender"
 license-file = "LICENSE"
 readme = "README.md"
+
+[dependencies]
+rand = "0.8.4"
+sha256 = "1.0.2"
