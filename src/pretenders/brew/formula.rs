@@ -6,10 +6,10 @@ use sha256::digest;
 use std::fmt::Display;
 
 pub struct Formula {
-    name: String,
-    old_version: SemVer,
-    new_version: SemVer,
-    url: String,
+    pub name: String,
+    pub old_version: SemVer,
+    pub new_version: SemVer,
+    pub url: String,
 }
 
 impl Formula {
