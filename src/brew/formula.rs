@@ -1,7 +1,7 @@
 use crate::brew::formula_names::FORMULA_NAMES;
-use crate::semver::{SemVer, SemVerSection};
+use crate::semver::SemVer;
 use rand::prelude::SliceRandom;
-use rand::thread_rng;
+use rand::{random, thread_rng};
 use sha256::digest;
 use std::fmt::Display;
 
@@ -15,8 +15,8 @@ pub struct Formula {
 impl Formula {
     pub fn generate() -> Self {
         let name = FORMULA_NAMES.choose(&mut thread_rng()).unwrap().to_string();
-        let old_version = SemVer::generate();
-        let new_version = old_version.increment(SemVerSection::Patch);
+        let old_version: SemVer = random();
+        let new_version = old_version.upgrade_randomly();
         let sha256 = digest(&name);
 
         Formula {
