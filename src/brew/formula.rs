@@ -1,7 +1,8 @@
 use crate::brew::formula_names::FORMULA_NAMES;
 use crate::semver::SemVer;
-use rand::prelude::SliceRandom;
-use rand::{random, thread_rng};
+use rand::distributions::Standard;
+use rand::prelude::{Distribution, SliceRandom};
+use rand::random;
 use sha256::digest;
 use std::fmt::Display;
 
@@ -12,21 +13,19 @@ pub struct Formula {
     pub url: String,
 }
 
-impl Formula {
-    pub fn generate() -> Self {
-        let name = FORMULA_NAMES.choose(&mut thread_rng()).unwrap().to_string();
+impl Distribution<Formula> for Standard {
+    fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Formula {
+        let name = FORMULA_NAMES.choose(rng).unwrap();
         let old_version: SemVer = random();
         let new_version = old_version.upgrade_randomly();
-        let sha256 = digest(&name);
+        let sha256 = digest(name.to_owned());
+        let base_url = "https://ghcr.io/v2/homebrew/core";
 
         Formula {
-            name: name.to_owned(),
+            name: name.to_string(),
             old_version,
             new_version,
-            url: format!(
-                "https://ghcr.io/v2/homebrew/core/{}/blobs/sha256:{}",
-                &name, sha256
-            ),
+            url: format!("{}/{}/blobs/sha256:{}", base_url, name, sha256),
         }
     }
 }
