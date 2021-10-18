@@ -49,12 +49,16 @@ impl Cursor {
         self.prefix(prefix).suffix(suffix)
     }
 
+    pub fn with_style(self, style: Style) -> Self {
+        self.wrap(style, Style::Normal)
+    }
+
     pub fn with_color(self, color: Color) -> Self {
-        self.wrap(Style::ForegroundColor(color), Style::Normal)
+        self.with_style(Style::ForegroundColor(color))
     }
 
     pub fn with_background(self, color: Color) -> Self {
-        self.wrap(Style::BackgroundColor(color), Style::Normal)
+        self.with_style(Style::BackgroundColor(color))
     }
 
     pub fn at_previous_line(self) -> Self {
@@ -64,11 +68,21 @@ impl Cursor {
     pub fn at_next_line(self) -> Self {
         self.prefix(Position::NextLine(1))
     }
+
+    pub fn at_absolute_position(self, row: usize, column: usize) -> Self {
+        self.prefix(Position::Absolute(row, column))
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn it_creates_string_with_style() {
+        let cursor = Cursor::from("Hello").with_style(Style::Bold);
+        assert_eq!(cursor.string, String::from("\x1B[1mHello\x1B[0m"));
+    }
 
     #[test]
     fn it_creates_colorized_string() {
@@ -92,6 +106,12 @@ mod tests {
     fn it_creates_string_at_next_line() {
         let cursor = Cursor::from("Hello").at_next_line();
         assert_eq!(cursor.string, String::from("\x1B[1EHello"));
+    }
+
+    #[test]
+    fn it_creates_string_at_absolute_position() {
+        let cursor = Cursor::from("Hello").at_absolute_position(10, 25);
+        assert_eq!(cursor.string, String::from("\x1B[10;25HHello"))
     }
 
     #[test]
