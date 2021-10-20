@@ -13,7 +13,9 @@ pub struct BrewPretender {
 
 impl Default for BrewPretender {
     fn default() -> Self {
-        let formulas = (10..20).map(|_| random()).collect();
+        let formulas = (0..thread_rng().gen_range(10..30))
+            .map(|_| random())
+            .collect();
 
         BrewPretender { formulas }
     }
