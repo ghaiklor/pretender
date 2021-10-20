@@ -21,8 +21,10 @@ impl Default for BrewPretender {
 
 impl BrewPretender {
     fn prelude(&self) {
+        let mut rng = thread_rng();
+
         println!("Updating Homebrew...");
-        sleep(Duration::from_secs(thread_rng().gen_range(5..10)));
+        sleep(Duration::from_secs(rng.gen_range(5..10)));
 
         println!(
             "{} {}",
@@ -37,7 +39,7 @@ impl BrewPretender {
             style("Updated Formulae").bold()
         );
 
-        println!("Updated {} formulae.", self.formulas.len());
+        println!("Updated {} formulae.", rng.gen_range(100..300));
     }
 
     fn upgrading_n_packages(&self) {
