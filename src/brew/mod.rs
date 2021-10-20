@@ -3,7 +3,7 @@ mod formula_names;
 
 use self::formula::Formula;
 use console::style;
-use indicatif::ProgressBar;
+use indicatif::{ProgressBar, ProgressStyle};
 use rand::{random, thread_rng, Rng};
 use std::{thread::sleep, time::Duration};
 
@@ -20,12 +20,27 @@ impl Default for BrewPretender {
 }
 
 impl BrewPretender {
-    pub fn pretend(self) {
-        let mut rng = thread_rng();
-
+    fn prelude(&self) {
         println!("Updating Homebrew...");
-        sleep(Duration::from_secs(rng.gen_range(5..10)));
+        sleep(Duration::from_secs(thread_rng().gen_range(5..10)));
 
+        println!(
+            "{} {}",
+            style("==>").blue(),
+            style("Auto-updated Homebrew!").bold()
+        );
+
+        println!("Updated 1 tap (homebrew/core).");
+        println!(
+            "{} {}",
+            style("==>").blue(),
+            style("Updated Formulae").bold()
+        );
+
+        println!("Updated {} formulae.", self.formulas.len());
+    }
+
+    fn upgrading_n_packages(&self) {
         println!(
             "{} Upgrading {} outdated packages:",
             style("==>").green(),
@@ -38,26 +53,45 @@ impl BrewPretender {
                 formula.name, formula.old_version, formula.new_version
             )
         }
+    }
+
+    fn upgrading_formula(&self, formula: &Formula) {
+        println!(
+            "{} Upgrading {} {} -> {}",
+            style("==>").green(),
+            style(formula.name.to_owned()).green(),
+            formula.old_version,
+            formula.new_version
+        );
+    }
+
+    fn downloading_formula(&self, formula: &Formula) {
+        let mut rng = thread_rng();
+
+        println!("{} Downloading {}", style("==>").blue(), formula.url);
+
+        let size = rng.gen_range(20..100) * 1024 * 1024;
+        let style = ProgressStyle::default_bar()
+            .template("{bar:72} {percent}.0%")
+            .progress_chars("## ");
+
+        let bar = ProgressBar::new(size).with_style(style);
+
+        while bar.position() < size {
+            bar.inc(rng.gen_range(10..500) * 1024);
+            sleep(Duration::from_millis(rng.gen_range(5..100)));
+        }
+
+        bar.finish_and_clear();
+    }
+
+    pub fn pretend(self) {
+        self.prelude();
+        self.upgrading_n_packages();
 
         for formula in &self.formulas {
-            println!(
-                "{} Upgrading {} {} -> {}",
-                style("==>").blue(),
-                style(formula.name.to_owned()).blue(),
-                formula.old_version,
-                formula.new_version
-            );
-
-            println!("{} Downloading {}", style("==>").green(), formula.url);
-
-            let size = thread_rng().gen_range(20..100) * 1024;
-            let pb = ProgressBar::new(size);
-
-            while pb.position() < size {
-                pb.inc(thread_rng().gen_range(50..200));
-                sleep(Duration::from_millis(100));
-            }
-            pb.finish_and_clear();
+            self.upgrading_formula(formula);
+            self.downloading_formula(formula);
         }
     }
 }
