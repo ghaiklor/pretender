@@ -2,7 +2,7 @@ mod formula;
 mod formula_names;
 
 use self::formula::Formula;
-use console::style;
+use console::{style, Emoji};
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::{random, thread_rng, Rng};
 use std::{thread::sleep, time::Duration};
@@ -42,6 +42,7 @@ impl BrewPretender {
         );
 
         println!("Updated {} formulae.", rng.gen_range(100..300));
+        println!();
     }
 
     fn upgrading_n_packages(&self) {
@@ -60,13 +61,44 @@ impl BrewPretender {
     }
 
     fn upgrading_formula(&self, formula: &Formula) {
+        let mut rng = thread_rng();
+
         println!(
-            "{} Upgrading {} {} -> {}",
+            "{} Upgrading {}",
             style("==>").green(),
             style(formula.name.to_owned()).green(),
-            formula.old_version,
+        );
+
+        println!("  {} -> {}", formula.old_version, formula.new_version);
+        println!();
+
+        println!(
+            "{} Pouring {}--{}.big_sur.bottle.tar.gz",
+            style("==>").blue(),
+            formula.name,
             formula.new_version
         );
+
+        sleep(Duration::from_secs(rng.gen_range(1..5)));
+
+        let files_count = rng.gen_range(10..300);
+        let size = rng.gen_range(2..10);
+
+        println!(
+            "{} /usr/local/Cellar/{}/{}: {} files, {}.0MB",
+            Emoji::new("🍺", ""),
+            formula.name,
+            formula.new_version,
+            files_count,
+            size
+        );
+
+        println!(
+            "Removing: /usr/local/Cellar/{}/{}... ({} files, {}.0MB)",
+            formula.name, formula.old_version, files_count, size
+        );
+
+        sleep(Duration::from_secs(rng.gen_range(1..5)));
     }
 
     fn downloading_formula(&self, formula: &Formula) {
@@ -86,7 +118,7 @@ impl BrewPretender {
             sleep(Duration::from_millis(rng.gen_range(5..100)));
         }
 
-        bar.finish_and_clear();
+        bar.finish();
     }
 
     pub fn pretend(self) {
@@ -94,8 +126,11 @@ impl BrewPretender {
         self.upgrading_n_packages();
 
         for formula in &self.formulas {
-            self.upgrading_formula(formula);
             self.downloading_formula(formula);
+        }
+
+        for formula in &self.formulas {
+            self.upgrading_formula(formula);
         }
     }
 }
